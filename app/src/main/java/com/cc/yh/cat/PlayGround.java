@@ -57,11 +57,20 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
             }else {
                  x=(int) e.getX()/width;
             }
-            getDot(x,y).setStatus(Dot.status_on);
+            try {
+                if (getDot(x,y).getStatus()==Dot.status_off) {
+                    getDot(x, y).setStatus(Dot.status_on);
+                    catMove();
+                }
+            } catch (ArrayIndexOutOfBoundsException e1) {
+                e1.printStackTrace();
+
+
+
+
+            }
         }
         draw();
-
-
         return true;
     }
 
@@ -88,10 +97,24 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
     private Dot getDot(int x, int y) {
         return matrix[y][x];
 
-
     }
 
     private Dot getNeighbourDot(Dot ori, int dir) {
+        switch (dir){
+            case 1:
+                return getDot(ori.getX()-1,ori.getY());
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+        }
+
+
+
+
+
+
         return null;
     }
 
@@ -100,6 +123,15 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
     }
 
     private void catMove() {
+        for (int i = 0; i <7 ; i++) {
+            Dot one=getNeighbourDot(cat,i);
+        }
+
+
+
+
+
+
 
     }
 
