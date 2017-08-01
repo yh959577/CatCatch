@@ -1,19 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.cc.yh.cat.MainActivity">
+   <com.cc.yh.cat.PlayGround
+       android:id="@+id/play_ground"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"/>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        >
+        <Button
+            android:id="@+id/finish_game"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/finish_game"
+            android:layout_weight="1"
+            />
+        <Button
+            android:id="@+id/reset_blocks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reset_blocks"
+            android:layout_weight="1"
+            />
+        <Button
+            android:id="@+id/select_difficult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_difficulty"
+            android:layout_weight="1"
+            />
 
-</android.support.constraint.ConstraintLayout>
+    </LinearLayout>
+
+
+
+
+</FrameLayout>

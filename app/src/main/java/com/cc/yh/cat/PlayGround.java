@@ -5,10 +5,17 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Toast;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2017/7/31.
@@ -18,16 +25,22 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
 
     private static final int ROW = 10;
     private static final int COL = 10;
+    private static final String TAG = "PlayGround";
+    private static int EASY=30;
+    private static int NORMAL=20;
+    private static int HARDER=15;
+    private static int HELL=10;
     private Dot[][] matrix;
     private Dot cat;
     private int width;
     private int height;
 
-    public PlayGround(Context context) {
-        super(context);
+    public PlayGround(Context context, AttributeSet attr){
+        super(context,attr);
         initialGame();
         getHolder().addCallback(this);
         setOnTouchListener(this);
+
     }
 
     @Override
@@ -37,8 +50,8 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        this.width = width/11;
-        this.height=height/20;
+        this.width = width / 11;
+        this.height = height / 20;
         draw();
     }
 
@@ -49,32 +62,29 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
 
     @Override
     public boolean onTouch(View v, MotionEvent e) {
-        if (e.getAction()==MotionEvent.ACTION_UP){
+        if (e.getAction() == MotionEvent.ACTION_UP) {
             int x;
-            int y=(int) e.getY()/height;
-            if (y%2!=0){
-                 x=(int) (e.getX()-(width/2))/width;
-            }else {
-                 x=(int) e.getX()/width;
+            int y = (int) e.getY() / height;
+            if (y % 2 != 0) {
+                x = (int) (e.getX() - (width / 2)) / width;
+            } else {
+                x = (int) e.getX() / width;
             }
             try {
-                if (getDot(x,y).getStatus()==Dot.status_off) {
+                if (getDot(x, y).getStatus() == Dot.status_off) {
                     getDot(x, y).setStatus(Dot.status_on);
                     catMove();
                 }
             } catch (ArrayIndexOutOfBoundsException e1) {
                 e1.printStackTrace();
-
-
-
-
+                Toast.makeText(getContext(),"你不要乱点 -_-|||",Toast.LENGTH_SHORT).show();
             }
         }
         draw();
         return true;
     }
 
-    private void initialGame() {
+    public void initialGame() {
         matrix = new Dot[ROW][COL];
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++) {
@@ -83,7 +93,7 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
             }
         }
         cat = getDot(ROW / 2, COL / 2).setStatus(Dot.status_in);
-        for (int i = 0; i < 15; ) {
+        for (int i = 0; i < NORMAL; ) {
             int x = (int) (Math.random() * 1000) % COL;
             int y = (int) (Math.random() * 1000) % ROW;
             if (getDot(x, y).getStatus() == Dot.status_off) {
@@ -91,8 +101,10 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
                 i++;
             }
         }
-
-    }
+        if (width!=0&&height!=0) {
+            draw();
+        }
+        }
 
     private Dot getDot(int x, int y) {
         return matrix[y][x];
@@ -100,38 +112,130 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
     }
 
     private Dot getNeighbourDot(Dot ori, int dir) {
-        switch (dir){
-            case 1:
-                return getDot(ori.getX()-1,ori.getY());
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
+        if (isAtEdge(ori)){
+            return null;
         }
+        if (ori.getY() % 2 == 0) {
+            switch (dir) {
+                case 1:
+                    return getDot(ori.getX() - 1, ori.getY());
+                case 2:
+                    return getDot(ori.getX() - 1, ori.getY() - 1);
+                case 3:
+                    return getDot(ori.getX(), ori.getY() - 1);
+                case 4:
+                    return getDot(ori.getX() + 1, ori.getY());
+                case 5:
+                    return getDot(ori.getX(), ori.getY() + 1);
+                case 6:
+                    return getDot(ori.getX() - 1, ori.getY() + 1);
+            }
 
+        } else {
+            switch (dir) {
+                case 1:
+                    return getDot(ori.getX() - 1, ori.getY());
+                case 2:
+                    return getDot(ori.getX(), ori.getY() - 1);
+                case 3:
+                    return getDot(ori.getX() + 1, ori.getY() - 1);
+                case 4:
+                    return getDot(ori.getX() + 1, ori.getY());
+                case 5:
+                    return getDot(ori.getX() + 1, ori.getY() + 1);
+                case 6:
+                    return getDot(ori.getX(), ori.getY() + 1);
+            }
 
-
-
-
-
+        }
         return null;
     }
 
-    private int getDistance(Dot cat, int dir) {
-        return 0;
+    private void lose() {
+       Toast.makeText(getContext(),"YOU LOSE",Toast.LENGTH_SHORT).show();
+    }
+
+    private int getDistance(Dot next, int dir) {
+        int steps = 1;
+        while (true) {
+            if (next.getStatus() == Dot.status_on) {
+                return -steps;
+            } else if (isAtEdge(next)) {
+                return steps;
+            } else {
+                next = getNeighbourDot(next, dir);
+                steps++;
+            }
+
+        }
+
+    }
+
+    private boolean isAtEdge(Dot d) {
+
+        return (d.getX() * d.getY() == 0 || d.getX() == 9 || d.getY() == 9);
     }
 
     private void catMove() {
-        for (int i = 0; i <7 ; i++) {
-            Dot one=getNeighbourDot(cat,i);
+        Dot bestNext = getBestNextDot();
+        if (bestNext==null){
+            return;
+        }
+        getDot(cat.getX(),cat.getY()).setStatus(Dot.status_off);
+        cat=bestNext;
+        getDot(cat.getX(),cat.getY()).setStatus(Dot.status_in);
+        if (isAtEdge(cat)){
+            lose();
         }
 
+    }
 
+    private Dot getBestNextDot() {
+        int best = 0;
+        Dot bestDot=null;
+        HashMap<Dot, Integer> dotAndDistance = new HashMap<>();
+        for (int i = 1; i < 7; i++) {
+            Dot next = getNeighbourDot(cat, i);
+            if (next==null){
+                return null;
+            }
+            int distance = getDistance(next, i);
+            dotAndDistance.put(next, distance);
+            Log.d(TAG, "catMove:  " + i + "方向======" + distance);
+        }
+        Iterator inter = dotAndDistance.entrySet().iterator();
+        while (inter.hasNext()) {
+            Map.Entry entry = (Map.Entry) inter.next();
+            int distance = (int) entry.getValue();
+            if (best == 0) {
+                best = distance;
+            } else {
+                if (best > 0) {
+                    if (distance > 0 && distance < best) {
+                        best = distance;
+                    }
+                } else {
+                    if (distance > 0 || distance < best) {
+                        best = distance;
+                    }
+                }
+            }
+            Log.d(TAG, "getBestNextDot: value=====" + distance);
+            if (distance==best){
+                bestDot=(Dot) entry.getKey();
+            }
+        }
+        if (best==-1){
+            win();
+            return null;
+        }
 
+        Log.d(TAG, "getBestNextDot: BestPath=====" +best);
+        return bestDot;
+    }
 
-
-
+    private void win() {
+        Toast.makeText(getContext(),"Win",Toast.LENGTH_SHORT).show();
 
     }
 
@@ -140,9 +244,9 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
         c.drawColor(Color.CYAN);
         Paint p = new Paint();
         for (int i = 0; i < ROW; i++) {
-            int offset=0;
-            if (i%2!=0){
-                offset=width/2;
+            int offset = 0;
+            if (i % 2 != 0) {
+                offset = width / 2;
             }
             for (int j = 0; j < COL; j++) {
                 Dot one = getDot(j, i);
@@ -159,9 +263,9 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
                     default:
                         break;
                 }
-                c.drawOval(new RectF(one.getX()*width+offset,one.getY()*height,
-                        (one.getX()+1)*width+offset,(one.getY()+1)*height
-                        ),p);
+                c.drawOval(new RectF(one.getX() * width + offset, one.getY() * height,
+                        (one.getX() + 1) * width + offset, (one.getY() + 1) * height
+                ), p);
             }
         }
         getHolder().unlockCanvasAndPost(c);

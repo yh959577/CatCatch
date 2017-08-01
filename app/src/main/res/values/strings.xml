@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Cat</string>
+    <string name="finish_game">退出游戏</string>
+    <string name="reset_blocks">重置路障</string>
+    <string name="select_difficulty">选择难度</string>
+    <string name="easy">简单</string>
+<string name="normal">正常</string>
+<string name="harder">困难</string>
+    <string name="hell">地狱</string>
 </resources>
