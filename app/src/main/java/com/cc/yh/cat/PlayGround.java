@@ -26,10 +26,7 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
     private static final int ROW = 10;
     private static final int COL = 10;
     private static final String TAG = "PlayGround";
-    private static int EASY=30;
-    private static int NORMAL=20;
-    private static int HARDER=15;
-    private static int HELL=10;
+    private int BLOCKS=MainActivity.NORMAL;
     private Dot[][] matrix;
     private Dot cat;
     private int width;
@@ -40,6 +37,12 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
         initialGame();
         getHolder().addCallback(this);
         setOnTouchListener(this);
+
+    }
+
+    public void setLevel(int level){
+        BLOCKS=level;
+        initialGame();
 
     }
 
@@ -77,7 +80,6 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
                 }
             } catch (ArrayIndexOutOfBoundsException e1) {
                 e1.printStackTrace();
-                Toast.makeText(getContext(),"你不要乱点 -_-|||",Toast.LENGTH_SHORT).show();
             }
         }
         draw();
@@ -93,7 +95,7 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
             }
         }
         cat = getDot(ROW / 2, COL / 2).setStatus(Dot.status_in);
-        for (int i = 0; i < NORMAL; ) {
+        for (int i = 0; i < BLOCKS; ) {
             int x = (int) (Math.random() * 1000) % COL;
             int y = (int) (Math.random() * 1000) % ROW;
             if (getDot(x, y).getStatus() == Dot.status_off) {
@@ -235,7 +237,7 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
     }
 
     private void win() {
-        Toast.makeText(getContext(),"Win",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(),"YOU WIN",Toast.LENGTH_SHORT).show();
 
     }
 

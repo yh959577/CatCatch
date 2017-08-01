@@ -7,4 +7,5 @@
 <string name="normal">正常</string>
 <string name="harder">困难</string>
     <string name="hell">地狱</string>
+    <string name="current_level">当前难度：</string>
 </resources>
