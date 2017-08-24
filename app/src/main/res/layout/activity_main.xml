@@ -9,7 +9,8 @@
    <com.cc.yh.cat.PlayGround
        android:id="@+id/play_ground"
        android:layout_width="match_parent"
-       android:layout_height="match_parent"/>
+       android:layout_height="match_parent"
+       />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="wrap_content"
@@ -22,7 +23,7 @@
         android:layout_height="wrap_content"
         android:text="@string/current_level"
         android:textSize="20sp"
-        android:textColor="@color/Black"
+        android:textColor="@color/White"
         android:layout_weight="1"
         />
     <TextView
@@ -31,7 +32,7 @@
         android:layout_height="wrap_content"
         android:text="@string/normal"
         android:textSize="20sp"
-        android:textColor="@color/Black"
+        android:textColor="@color/White"
         android:layout_weight="1"
         />
     </LinearLayout>
@@ -63,7 +64,6 @@
             android:text="@string/select_difficulty"
             android:layout_weight="1"
             />
-
     </LinearLayout>
 
 

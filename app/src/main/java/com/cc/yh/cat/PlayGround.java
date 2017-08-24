@@ -1,9 +1,13 @@
 package com.cc.yh.cat;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -31,9 +35,15 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
     private Dot cat;
     private int width;
     private int height;
+    private Bitmap mObstacleBitmap;
+    private Bitmap mCatBitmap;
+    private Bitmap mEmptyBitmap;
 
     public PlayGround(Context context, AttributeSet attr){
         super(context,attr);
+        setBackgroundResource(R.drawable.back_ground);
+        setZOrderOnTop(true);
+        getHolder().setFormat(PixelFormat.TRANSPARENT);
         initialGame();
         getHolder().addCallback(this);
         setOnTouchListener(this);
@@ -87,6 +97,8 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
     }
 
     public void initialGame() {
+        mObstacleBitmap= BitmapFactory.decodeResource(getResources(),R.drawable.obstacle);
+        mCatBitmap=BitmapFactory.decodeResource(getResources(),R.drawable.cat);
         matrix = new Dot[ROW][COL];
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++) {
@@ -240,10 +252,11 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
         Toast.makeText(getContext(),"YOU WIN",Toast.LENGTH_SHORT).show();
 
     }
-
     private void draw() {
         Canvas c = getHolder().lockCanvas();
-        c.drawColor(Color.CYAN);
+
+//        c.drawColor(Color.CYAN);
+        c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         Paint p = new Paint();
         for (int i = 0; i < ROW; i++) {
             int offset = 0;
@@ -254,20 +267,37 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
                 Dot one = getDot(j, i);
                 switch (one.getStatus()) {
                     case Dot.status_off:
+//                        mBitmap=BitmapFactory.decodeResource(getResources(),R.drawable.white);
+//                        p.setColor(Color.WHITE);
                         p.setColor(Color.WHITE);
+                        c.drawOval(new RectF(one.getX() * width + offset, one.getY() * height,
+                        (one.getX() + 1) * width + offset, (one.getY() + 1) * height
+               ), p);
                         break;
                     case Dot.status_on:
-                        p.setColor(Color.YELLOW);
+                        c.drawBitmap(mObstacleBitmap,null
+                                ,new RectF(one.getX() * width + offset, one.getY() * height,
+                                        (one.getX() + 1) * width + offset, (one.getY() + 1) * height)
+                                ,p);
+//                        p.setColor(Color.YELLOW);
                         break;
                     case Dot.status_in:
-                        p.setColor(Color.RED);
+                        c.drawBitmap(mCatBitmap,null,new RectF(one.getX() * width + offset, one.getY() * height,
+                                        (one.getX() + 1) * width + offset, (one.getY() + 1) * height)
+                                ,p);
+//                        mBitmap=BitmapFactory.decodeResource(getResources(),R.drawable.cat);
+//                        p.setColor(Color.RED);
                         break;
                     default:
                         break;
                 }
-                c.drawOval(new RectF(one.getX() * width + offset, one.getY() * height,
-                        (one.getX() + 1) * width + offset, (one.getY() + 1) * height
-                ), p);
+//
+//                c.drawBitmap(mBitmap,null,new RectF(one.getX() * width + offset, one.getY() * height,
+//                        (one.getX() + 1) * width + offset, (one.getY() + 1) * height)
+//                ,p);
+//                c.drawOval(new RectF(one.getX() * width + offset, one.getY() * height,
+//                        (one.getX() + 1) * width + offset, (one.getY() + 1) * height
+//                ), p);
             }
         }
         getHolder().unlockCanvasAndPost(c);

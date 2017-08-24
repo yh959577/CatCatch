@@ -4,8 +4,9 @@
     <string name="reset_blocks">重置路障</string>
     <string name="select_difficulty">选择难度</string>
     <string name="easy">简单</string>
-<string name="normal">正常</string>
-<string name="harder">困难</string>
+    <string name="normal">正常</string>
+    <string name="harder">困难</string>
     <string name="hell">地狱</string>
     <string name="current_level">当前难度：</string>
+    <string name="icon_name">抓住小</string>
 </resources>
