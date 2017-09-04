@@ -1,6 +1,7 @@
 package com.cc.yh.cat;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -38,6 +39,9 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
     private Bitmap mObstacleBitmap;
     private Bitmap mCatBitmap;
     private Bitmap mEmptyBitmap;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+    private updateView mUpdateView;
 
     public PlayGround(Context context, AttributeSet attr){
         super(context,attr);
@@ -54,6 +58,10 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
         BLOCKS=level;
         initialGame();
 
+    }
+
+    public void setUpdateView(updateView updateView){
+        mUpdateView=updateView;
     }
 
     @Override
@@ -86,6 +94,7 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
             try {
                 if (getDot(x, y).getStatus() == Dot.status_off) {
                     getDot(x, y).setStatus(Dot.status_on);
+                    mUpdateView.updateLastView();
                     catMove();
                 }
             } catch (ArrayIndexOutOfBoundsException e1) {
@@ -97,6 +106,7 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
     }
 
     public void initialGame() {
+//        mSharedPreferences=getContext().getSharedPreferences();
         mObstacleBitmap= BitmapFactory.decodeResource(getResources(),R.drawable.obstacle);
         mCatBitmap=BitmapFactory.decodeResource(getResources(),R.drawable.cat);
         matrix = new Dot[ROW][COL];
@@ -117,6 +127,7 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
         }
         if (width!=0&&height!=0) {
             draw();
+            mUpdateView.resetStep();
         }
         }
 
@@ -250,7 +261,8 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
 
     private void win() {
         Toast.makeText(getContext(),"YOU WIN",Toast.LENGTH_SHORT).show();
-
+        mUpdateView.saveBestStep();
+        mUpdateView.updateBestView();
     }
     private void draw() {
         Canvas c = getHolder().lockCanvas();
@@ -303,4 +315,10 @@ public class PlayGround extends SurfaceView implements SurfaceHolder.Callback, V
         getHolder().unlockCanvasAndPost(c);
     }
 
+    public interface updateView{
+        void updateLastView();
+        void saveBestStep();
+        void updateBestView();
+        void resetStep();
+    }
 }

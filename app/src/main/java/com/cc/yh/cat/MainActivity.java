@@ -1,8 +1,10 @@
 package com.cc.yh.cat;
 
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -10,23 +12,27 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,PlayGround.updateView{
     PlayGround playGround;
     Button btnFinishGame;
     Button btnResetBlocks;
     Button btnSelectDifficult;
     TextView tvCurrentLevel;
-    private int flag=1;
-
     public static int EASY=30;
     public static int NORMAL=20;
     public static int HARDER=15;
     public static int HELL=10;
     private PopupWindow mPopupWindow;
-
+    DisplayMetrics mDisplayMetrics;
+    TextView bestRecorder;
+    TextView lastRecorder;
+    int recentStep;
+    SharedPreferences mSharedPreferences;
+    SharedPreferences.Editor mEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,23 +41,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
                 );
         setContentView(R.layout.activity_main);
-
+        recentStep=0;
+        mSharedPreferences=getSharedPreferences("best",MODE_PRIVATE);
+        mEditor=mSharedPreferences.edit();
+        mDisplayMetrics=getResources().getDisplayMetrics();
         playGround=(PlayGround)findViewById(R.id.play_ground);
         btnFinishGame=(Button)findViewById(R.id.finish_game);
         btnResetBlocks=(Button)findViewById(R.id.reset_blocks);
         btnSelectDifficult=(Button)findViewById(R.id.select_difficult);
         tvCurrentLevel=(TextView)findViewById(R.id.current_level);
-
         btnFinishGame.setOnClickListener(this);
         btnResetBlocks.setOnClickListener(this);
         btnSelectDifficult.setOnClickListener(this);
+        playGround.setUpdateView(this);
+        createLeftMenu();
+
     }
 
-
-
-
-
-
+    private void createLeftMenu() {
+        SlidingMenu LeftMenu=new SlidingMenu(this);
+        LeftMenu.setMode(SlidingMenu.LEFT);
+        LeftMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        LeftMenu.setBehindWidth(mDisplayMetrics.widthPixels/2);
+        LeftMenu.attachToActivity(this,SlidingMenu.SLIDING_WINDOW);
+        LeftMenu.setMenu(R.layout.layout_menu);
+        bestRecorder=(TextView)LeftMenu.findViewById(R.id.best_number);
+        lastRecorder=(TextView)LeftMenu.findViewById(R.id.recent_number);
+        bestRecorder.setText(mSharedPreferences.getInt("best",0)+"");
+    }
 
 
     @Override
@@ -64,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.select_difficult:
                 showPopupWindow();
-//                mSelectDialog.show();
                 break;
             default:
                 break;
@@ -72,9 +88,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-    RadioButton[] radioButtons=new RadioButton[]{
-
-    };
     private void showPopupWindow() {
         View view=getLayoutInflater().inflate(R.layout.poupu_window_view,null);
         ListView listView=(ListView)view.findViewById(R.id.list_view);
@@ -121,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void harderLevel() {
-      playGround.setLevel(HARDER);
+       playGround.setLevel(HARDER);
         tvCurrentLevel.setText(R.string.harder);
     }
 
@@ -129,4 +142,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         playGround.setLevel(HELL);
         tvCurrentLevel.setText(R.string.hell);
     }
+
+    @Override
+    public void updateLastView() {
+        recentStep++;
+        lastRecorder.setText(recentStep+"");
+    }
+
+    @Override
+    public void saveBestStep() {
+        if (mSharedPreferences.getInt("best",0)>recentStep
+                ) {
+            mEditor.clear();
+            mEditor.putInt("best", recentStep);
+            mEditor.commit();
+        }
+
+    }
+    @Override
+    public void updateBestView() {
+       bestRecorder.setText(getSharedPreferences("best",MODE_PRIVATE).getInt("best",0)+"");
+    }
+
+    @Override
+    public void resetStep() {
+        recentStep=0;
+    }
+
 }

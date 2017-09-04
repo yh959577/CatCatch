@@ -8,5 +8,11 @@
     <string name="harder">困难</string>
     <string name="hell">地狱</string>
     <string name="current_level">当前难度：</string>
-    <string name="icon_name">抓住小</string>
+    <string name="icon_name">抓住小猫</string>
+    <string name="best_recorder">最佳记录</string>
+    <string name="last_recorder">本次记录</string>
+    <string name="step">步</string>
+    <string name="OK">确定</string>
+    <string name="Question">请输入你的生日:</string>
+
 </resources>
